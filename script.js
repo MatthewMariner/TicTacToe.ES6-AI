@@ -27,8 +27,16 @@ function startGame() {
 	}
 }
 
+//Turn switching
 function turnClick(square) {
-	turn(square.target.id, huPlayer)
+	//If the square hasn't been clicked
+	if (typeof origBoard[square.target.id] == 'number')
+	{
+		//Setup(action, actionTaker)
+		turn(square.target.id, huPlayer)
+		//If its not a tie, computer's turn
+		if (!checkWin(origBoard, huPlayer) && !checkTie()) turn(bestSpot(), aiPlayer);
+	}
 }
 
 function turn(squareId, player) {
@@ -66,5 +74,69 @@ function gameOver(gameWon) {
 		//Remove event listener
 		cells[i].removeEventListener('click', turnClick, false);
 	}
+	declareWinner(gameWon.player == huPlayer ? "You Win" : "You Lose");
 }
+
+function emptySquares() {
+	//Finds empty squares
+	return origBoard.filter(s => typeof s == 'number');
+}
+
+//Declares winner
+function declareWinner(who) {
+
+	document.querySelector(".endgame").style.display = "block";
+	document.querySelector(".endgame .text").innerText = who;
+
+}
+
+//AI spot
+function bestSpot() {
+	return emptySquares()[0];
+}
+
+function checkTie() {
+	//If every square is filled up and no1 has won - then TIE
+	if (emptySquares().length == 0) 
+	{
+		// For each square , color and turn off listener
+		for (var i = 0; i < cells.length; i++) 
+		{
+			//Sets background coor
+			cells[i].style.backgroundColor = "green";
+			//Removes event listener
+			cells[i].removeEventListener('click', turnClick, false);
+		}
+		//Declare winner - true
+		declareWinner("Tie Game!");
+		return true;
+	}
+
+}
+
+
+function checkTie() {
+	if (emptySquares().length == 0) {
+		for (var i = 0; i < cells.length; i++) {
+			cells[i].style.backgroundColor = "green";
+			cells[i].removeEventListener('click', turnClick, false);
+		}
+		declareWinner("Tie Game!")
+		return true;
+	}
+	return false;
+}
+
+/*
+*
+*		Minimax Algo - recursive function
+*
+*		1. return a value if a terminal state is found (+10, 0, -10)
+*		2. go through available spots on the board
+*		3. call the minimax function on each available spot (recursion)
+*		4. evaluate returning values from function calls.
+*		5. and return the best value
+*
+*
+*/
 
