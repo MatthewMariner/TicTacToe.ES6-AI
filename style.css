@@ -48,3 +48,12 @@ table tr td:last-child {
   color: white;
   font-size: 2em;
 }
+
+button {
+	top: 120px;
+    background-color: #009688;
+	text-align: center;
+	border-radius: 5px;
+	color: white;
+	padding: 5px;
+}
