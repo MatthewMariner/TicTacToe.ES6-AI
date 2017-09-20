@@ -92,7 +92,9 @@ function declareWinner(who) {
 
 //AI spot
 function bestSpot() {
-	return emptySquares()[0];
+	// return emptySquares()[0];
+	//Returns best spot from minimax algo
+	return minimax(origBoard, aiPlayer).index;
 }
 
 function checkTie() {
@@ -140,3 +142,86 @@ function checkTie() {
 *
 */
 
+function minimax(newBoard, player) {
+
+	//Empty Squares 
+	var availSpots = emptySquares(newBoard);
+
+
+	//Terminal States
+	if (checkWin(newBoard, huPlayer)) //If '0' wins
+	{
+		return {score: -10};
+	} 
+	else if (checkWin(newBoard, aiPlayer)) //If 'X' win
+	{
+		return {score: 10};
+	} 
+	else if (availSpots.length === 0) //No room to play, game is a tie
+	{
+		return {score: 0};
+	}
+
+
+	//Collect scores of each empty spot to eval(), basically looping through every single space to determine the best move
+	var moves = [];
+	for (var i = 0; i < availSpots.length; i++) {
+		var move = {};
+		//Set old index to new index.property
+		move.index = newBoard[availSpots[i]];
+		newBoard[availSpots[i]] = player;
+
+		/*
+		*
+		*		Recursion method - calls itself with different boards
+		*
+		*/
+
+		//Set empty spot to new player
+		if (player == aiPlayer) 
+		{
+			var result = minimax(newBoard, huPlayer);
+			move.score = result.score;
+		} 
+		else 		//Keeps going deeper into recursion until found a state
+		{
+			var result = minimax(newBoard, aiPlayer);
+			move.score = result.score;
+		}
+
+		//Pushes move and resets board to previous board
+		newBoard[availSpots[i]] = move.index;
+		moves.push(move);
+
+	}
+
+	//Finds the highest score when AI is player, lowest when Human is player
+	var bestMove;
+	if(player === aiPlayer) 
+	{
+		var bestScore = -10000;
+		for(var i = 0; i < moves.length; i++) 
+		{
+			if (moves[i].score > bestScore) 
+			{
+				bestScore = moves[i].score;
+				bestMove = i;
+			}
+		}
+	} 
+	else 
+	{
+		var bestScore = 10000;
+		for(var i = 0; i < moves.length; i++) 
+		{
+			if (moves[i].score < bestScore)
+			{
+				bestScore = moves[i].score;
+				bestMove = i;
+			}
+		}
+	}
+
+	//Returns best object
+	return moves[bestMove];
+}
